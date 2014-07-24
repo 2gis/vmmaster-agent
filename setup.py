@@ -7,7 +7,7 @@ setup(
     url='https://github.com/nwlunatic/vmmaster-agent',
     packages=find_packages(),
     install_requires=[
-        "twisted==13.2.0",
+        "twisted==14.0.0",
         "pyscreenshot==0.3.2"
     ],
     entry_points={
