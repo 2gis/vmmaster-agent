@@ -10,5 +10,9 @@ setup(
         "twisted==13.2.0",
         "pyscreenshot==0.3.2"
     ],
-    scripts=['bin/vmmaster_agent'],
+    entry_points={
+        'console_scripts': [
+            'vmmaster_agent = vmmaster_agent.agent:main',
+        ],
+    },
 )

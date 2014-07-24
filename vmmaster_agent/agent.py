@@ -11,3 +11,7 @@ class VMMasterAgent(object):
 
     def run(self):
         reactor.run()
+
+
+def main():
+    VMMasterAgent().run()
