@@ -8,7 +8,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         "twisted==14.0.0",
-        "pyscreenshot==0.3.2"
+        "pyscreenshot==0.3.2",
+        "PIL==1.1.7"
     ],
     entry_points={
         'console_scripts': [
