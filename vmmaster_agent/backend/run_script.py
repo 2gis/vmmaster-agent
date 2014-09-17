@@ -25,11 +25,11 @@ def run_command(command, silent=False):
 def run_script(script, command=None):
     if command is None:
         if platform.system() == "Windows":
+            tmp_file_path = tempfile.mktemp(suffix=".bat")
             command = "cmd.exe /c"
         else:
+            tmp_file_path = tempfile.mktemp()
             command = "/bin/bash"
-
-    tmp_file_path = tempfile.mktemp()
 
     with open(tmp_file_path, "w") as f:
         f.write(script)
