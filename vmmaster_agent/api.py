@@ -9,9 +9,11 @@ from .backend import take_screenshot, run_script
 
 
 def json_response(data, request):
+    j = json.dumps(data)
     request.responseHeaders.addRawHeader(b"content-type", b"application/json")
     request.responseHeaders.addRawHeader(b"connection", b"close")
-    request.write(json.dumps(data))
+    request.responseHeaders.addRawHeader(b"content-length", str(len(j)))
+    request.write(j)
     request.finish()
 
 
