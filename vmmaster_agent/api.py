@@ -8,30 +8,29 @@ from twisted.web.server import NOT_DONE_YET
 from .backend import take_screenshot, run_script
 
 
+def json_response(data, request):
+    request.responseHeaders.addRawHeader(b"content-type", b"application/json")
+    request.responseHeaders.addRawHeader(b"connection", b"close")
+    request.write(json.dumps(data))
+    request.finish()
+
+
 class TakeScreenshot(Resource):
     isLeaf = True
 
-    def do_something_with_screenshot(self, screenshot, request):
-        request.write(json.dumps({'screenshot': screenshot}))
-        request.finish()
-
     def render_GET(self, request):
         d = deferToThread(take_screenshot)
-        d.addCallback(lambda screenshot: TakeScreenshot.do_something_with_screenshot(self, screenshot, request))
+        d.addCallback(lambda screenshot: json_response({'screenshot': screenshot}, request))
         return NOT_DONE_YET
 
 
 class RunScript(Resource):
     isLeaf = True
 
-    def form_response(self, return_code, output, request):
-        request.write(json.dumps({'status': return_code, 'output': output}))
-        request.finish()
-
     def render_POST(self, request):
         data = json.loads(request.content.read())
         d = deferToThread(run_script, data.get("script"), data.get("command", None))
-        d.addCallback(lambda r: self.form_response(r[0], r[1], request))
+        d.addCallback(lambda r: json_response({'status': r[0], 'output': r[1]}, request))
         return NOT_DONE_YET
 
 
