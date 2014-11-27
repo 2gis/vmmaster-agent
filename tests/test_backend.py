@@ -27,3 +27,9 @@ class TestBackend(unittest.TestCase):
             "command_to_fail")
         self.assertEqual(127, output[0])
         self.assertTrue("line 1: command_to_fail: command not found\n" in output[1])
+
+    def test_output_with_stderr(self):
+        output = run_script(
+            ">&2 echo 'error'")
+        self.assertEqual(0, output[0])
+        self.assertEqual("error\n", output[1])
