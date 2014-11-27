@@ -33,6 +33,7 @@ class RunScript(Resource):
         data = json.loads(request.content.read())
         d = deferToThread(run_script, data.get("script"), data.get("command", None))
         d.addCallback(lambda r: json_response({'status': r[0], 'output': r[1]}, request))
+        d.addErrback(lambda f: json_response({'status': 127, 'output': str(f)}, request))
         return NOT_DONE_YET
 
 
