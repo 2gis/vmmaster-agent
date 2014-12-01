@@ -1,4 +1,5 @@
 # coding: utf-8
+import subprocess
 import platform
 import base64
 import tempfile
@@ -9,6 +10,8 @@ try:
 except ImportError:
     pass
 
+from run_script import run_command
+
 
 ## Blocking code that record a desktop and saves to file
 def take_screenshot():
@@ -16,6 +19,8 @@ def take_screenshot():
 
     if platform.system() == "Windows":
         ImageGrab.grab().save(tmp_file_path)
+    if platform.system() == "Darwin":
+        run_command(["screencapture", tmp_file_path])
     else:
         pyscreenshot.grab_to_file(tmp_file_path)
 
