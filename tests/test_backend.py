@@ -4,7 +4,15 @@ import unittest
 from vmmaster_agent.backend import run_script
 
 
-class TestBackend(unittest.TestCase):
+class WebsocketLikeObject(object):
+    def __init__(self):
+        self.data = ""
+
+    def sendMessage(self, data):
+        self.data += data
+
+
+class TestRunScript(unittest.TestCase):
     def test_singleline_run_script(self):
         output = run_script("echo 'hello world'")
         self.assertEqual((0, "hello world\n"), output)
@@ -33,3 +41,9 @@ class TestBackend(unittest.TestCase):
             ">&2 echo 'error'")
         self.assertEqual(0, output[0])
         self.assertEqual("error\n", output[1])
+
+    def test_output_with_websocket(self):
+        websocket = WebsocketLikeObject()
+        output = run_script("echo 'hello world'", websocket=websocket)
+        self.assertEqual((0, ""), output)
+        self.assertEqual("hello world\n", websocket.data)
