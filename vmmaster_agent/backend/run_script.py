@@ -17,7 +17,7 @@ def run_command(command):
     process.wait()
     stdout.flush()
     stdout.seek(0)
-    output = stdout.read()
+    output = stdout.read().decode(sys.stdout.encoding)
     stdout.close()
     sys.stdout.write(output)
     log.info("Command ended with returncode %s" % process.returncode)
