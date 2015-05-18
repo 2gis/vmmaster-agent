@@ -17,8 +17,12 @@ script_with_command = {
     "command": "python",
     "script": "print 'hello world'"
 }
-run_script_request = partial(requests.post, "http://localhost:9000/runScript", data=json.dumps(script))
-run_script_request_with_command = partial(requests.post, "http://localhost:9000/runScript", data=json.dumps(script_with_command))
+run_script_request = partial(requests.post,
+                             "http://localhost:9000/runScript",
+                             data=json.dumps(script))
+run_script_request_with_command = partial(requests.post,
+                                          "http://localhost:9000/runScript",
+                                          data=json.dumps(script_with_command))
 
 
 class TestApi(unittest.TestCase):
