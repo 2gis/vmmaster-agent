@@ -6,10 +6,7 @@ import logging
 import os
 import sys
 from threading import Lock, Timer
-
-log = logging.getLogger(__name__)
-log.addHandler(logging.StreamHandler())
-log.setLevel(logging.INFO)
+from vmmaster_agent import log
 
 
 class Channel(object):
@@ -39,7 +36,9 @@ class Channel(object):
                 if isinstance(self.channel, str) or isinstance(self.channel, unicode):
                     self.channel += self.buffer
                 else:
-                    self.channel.sendMessage(bytes(self.buffer))
+                    if isinstance(self.buffer, unicode):
+                        self.buffer = self.buffer.encode('utf-8')
+                    self.channel.sendMessage(self.buffer)
                 self.buffer = ""
 
     def close(self):
@@ -56,9 +55,16 @@ def run_command(command, websocket):
 
     channel = Channel(websocket, autoflush=True)
     while process.poll() is None:
-        channel.write(process.stdout.read(1).decode(sys.stdout.encoding))
+        msg = process.stdout.read(1)
+        if isinstance(msg, unicode):
+            msg = msg.decode(sys.stdout.encoding)
+        channel.write(msg)
 
-    channel.write(process.stdout.read().decode(sys.stdout.encoding))
+    msg = process.stdout.read()
+    if isinstance(msg, unicode):
+        msg = msg.decode(sys.stdout.encoding)
+
+    channel.write(msg)
     channel.close()
 
     if isinstance(channel.channel, str) or isinstance(channel.channel, unicode):
@@ -70,7 +76,7 @@ def run_command(command, websocket):
 
 
 def run_script(script, command=None, websocket=None):
-    log.info("Got script: %s" % str(script))
+    log.info("Got script: %s" % script)
     tmp_file_path = None
     if command is None:
         if platform.system() == "Windows":
@@ -84,6 +90,11 @@ def run_script(script, command=None, websocket=None):
 
     with open(tmp_file_path, "w") as f:
         log.info("Writing script to: %s" % str(tmp_file_path))
+
+        if isinstance(script, unicode):
+            script = script.encode('utf8')
+
         f.write(script)
+
 
     return run_command(command.split(" ") + [tmp_file_path], websocket)

@@ -1,5 +1,7 @@
 import json
 
+from vmmaster_agent import log
+
 from twisted.web.server import Site
 from twisted.web.resource import Resource
 from twisted.internet.threads import deferToThread
@@ -67,6 +69,7 @@ class RunScriptWebSocketProtocol(WebSocketServerProtocol):
             self.sendClose(code=WebSocketServerProtocol.CLOSE_STATUS_CODE_NORMAL,
                            reason=unicode(result[1])[:120])
         else:
+            self.sendMessage(result.encode('utf-8'))
             self.sendClose(code=3001, reason=unicode(result)[:120])
 
 

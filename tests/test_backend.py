@@ -1,6 +1,6 @@
 # coding: utf-8
 import unittest
-
+from ddt import ddt, data
 from vmmaster_agent.backend import run_script
 
 
@@ -12,6 +12,7 @@ class WebsocketLikeObject(object):
         self.data += data
 
 
+@ddt
 class TestRunScript(unittest.TestCase):
     def test_singleline_run_script(self):
         output = run_script("echo 'hello world'")
@@ -42,8 +43,9 @@ class TestRunScript(unittest.TestCase):
         self.assertEqual(0, output[0])
         self.assertEqual("error\n", output[1])
 
-    def test_output_with_websocket(self):
+    @data('hello world', 'Привет, мир!')
+    def test_output_with_websocket(self, message):
         websocket = WebsocketLikeObject()
-        output = run_script("echo 'hello world'", websocket=websocket)
+        output = run_script("echo '%s'" % message, websocket=websocket)
         self.assertEqual((0, ""), output)
-        self.assertEqual("hello world\n", websocket.data)
+        self.assertEqual(message, websocket.data[:-1])

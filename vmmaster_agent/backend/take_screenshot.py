@@ -20,7 +20,7 @@ def take_screenshot():
     if platform.system() == "Windows":
         ImageGrab.grab().save(tmp_file_path)
     if platform.system() == "Darwin":
-        run_command(["screencapture", tmp_file_path])
+        run_command(["screencapture", tmp_file_path], None)
     else:
         pyscreenshot.grab_to_file(tmp_file_path)
 
