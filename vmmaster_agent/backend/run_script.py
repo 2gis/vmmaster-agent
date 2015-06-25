@@ -39,7 +39,7 @@ class Channel(object):
                 if isinstance(self.channel, str) or isinstance(self.channel, unicode):
                     self.channel += self.buffer
                 else:
-                    self.channel.sendMessage(bytes(self.buffer))
+                    self.channel.sendMessage(self.buffer.encode('utf-8'))
                 self.buffer = ""
 
     def close(self):
