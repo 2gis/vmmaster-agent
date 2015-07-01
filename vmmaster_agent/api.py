@@ -5,7 +5,7 @@ from twisted.web.resource import Resource
 from twisted.internet.threads import deferToThread
 from twisted.web.server import NOT_DONE_YET
 
-from .backend import take_screenshot, run_script
+from backend import take_screenshot, run_script
 
 
 def json_response(data, request):
