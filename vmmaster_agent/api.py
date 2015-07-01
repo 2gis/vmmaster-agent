@@ -7,7 +7,7 @@ from twisted.web.server import NOT_DONE_YET
 from autobahn.twisted.websocket import WebSocketServerFactory, WebSocketServerProtocol
 from autobahn.twisted.resource import WebSocketResource
 
-from .backend import take_screenshot, run_script
+from backend import take_screenshot, run_script
 
 
 def json_response(data, request):

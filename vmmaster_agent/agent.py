@@ -19,3 +19,7 @@ class VMMasterAgent(object):
 
 def main():
     VMMasterAgent(twisted_reactor).run()
+
+
+if __name__=="__main__":
+    main()
