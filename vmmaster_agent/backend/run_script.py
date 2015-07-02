@@ -4,12 +4,16 @@ import tempfile
 import platform
 import logging
 import os
-import sys
+import locale
+
 from threading import Lock, Timer
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
 log.setLevel(logging.INFO)
+
+
+ENCODING = locale.getpreferredencoding()
 
 
 class Channel(object):
@@ -56,9 +60,9 @@ def run_command(command, websocket):
 
     channel = Channel(websocket, autoflush=True)
     while process.poll() is None:
-        channel.write(process.stdout.read(1).decode(sys.stdout.encoding))
+        channel.write(process.stdout.read(1).decode(ENCODING))
 
-    channel.write(process.stdout.read().decode(sys.stdout.encoding))
+    channel.write(process.stdout.read().decode(ENCODING))
     channel.close()
 
     if isinstance(channel.channel, str) or isinstance(channel.channel, unicode):
