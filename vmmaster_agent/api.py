@@ -45,8 +45,6 @@ class RunScript(Resource):
 
 
 class RunScriptHTTP(Resource):
-    isLeaf = True
-
     def render_POST(self, request):
         data = json.loads(request.content.read())
         d = deferToThread(run_script, data.get("script"), data.get("command", None))

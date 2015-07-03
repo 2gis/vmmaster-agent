@@ -74,7 +74,7 @@ def run_command(command, websocket):
 
 
 def run_script(script, command=None, websocket=None):
-    log.info("Got script: %s" % str(script))
+    log.info("Got script: %s" % script.encode(ENCODING))
     tmp_file_path = None
     if command is None:
         if platform.system() == "Windows":
@@ -87,7 +87,7 @@ def run_script(script, command=None, websocket=None):
         tmp_file_path = tempfile.mktemp()
 
     with open(tmp_file_path, "w") as f:
-        log.info("Writing script to: %s" % str(tmp_file_path))
-        f.write(script)
+        log.info("Writing script to: %s" % tmp_file_path)
+        f.write(script.encode(ENCODING))
 
     return run_command(command.split(" ") + [tmp_file_path], websocket)

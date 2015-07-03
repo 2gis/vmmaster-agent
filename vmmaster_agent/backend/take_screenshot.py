@@ -11,17 +11,15 @@ except ImportError:
 from run_script import run_command
 
 
-##
 def take_screenshot():
     """
     Blocking code that takes screenshot of a desktop
-    :return: base64
+    :return: base64 string
     """
     tmp_file_path = tempfile.mktemp(suffix='.png')
-
     if platform.system() == "Windows":
         ImageGrab.grab().save(tmp_file_path)
-    if platform.system() == "Darwin":
+    elif platform.system() == "Darwin":
         run_command(["screencapture", tmp_file_path], None)
     else:
         run_command(["gnome-screenshot", "-f", tmp_file_path], None)
