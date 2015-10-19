@@ -1,7 +1,10 @@
 # coding: utf-8
 import unittest
+import time
+from mock import Mock
 
 from vmmaster_agent.backend import run_script
+from vmmaster_agent.backend.run_script import Flusher
 
 
 class WebsocketLikeObject(object):
@@ -47,3 +50,13 @@ class TestRunScript(unittest.TestCase):
         output = run_script("echo 'hello world'", websocket=websocket)
         self.assertEqual((0, ""), output)
         self.assertEqual("hello world\n", websocket.data)
+
+    def test_websocket_flusher(self):
+        mock = Mock()
+
+        flusher = Flusher(interval=0.1, callback=mock)
+        flusher.start()
+        time.sleep(0.5)
+        self.assertEqual(mock.call_count, 5)
+        time.sleep(0.5)
+        self.assertEqual(mock.call_count, 10)
