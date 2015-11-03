@@ -5,8 +5,9 @@ import platform
 import logging
 import os
 import locale
+import time
 
-from threading import Lock, Timer
+from threading import Lock, Thread
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
@@ -14,6 +15,24 @@ log.setLevel(logging.INFO)
 
 
 ENCODING = locale.getpreferredencoding()
+
+
+class Flusher(Thread):
+    def __init__(self, interval, callback):
+        Thread.__init__(self)
+        self.running = True
+        self.daemon = True
+        self.interval = interval
+        self.callback = callback
+
+    def run(self):
+        while self.running:
+            self.callback()
+            time.sleep(self.interval)
+
+    def stop(self):
+        self.running = False
+        self.join()
 
 
 class Channel(object):
@@ -28,7 +47,7 @@ class Channel(object):
 
         self.lock = Lock()
         if autoflush:
-            self.flusher = Timer(self.flush_frequency, self.flush)
+            self.flusher = Flusher(self.flush_frequency, self.flush)
             self.flusher.start()
 
     def write(self, _buffer):
@@ -36,7 +55,6 @@ class Channel(object):
             self.buffer += _buffer
 
     def flush(self):
-        self.flusher = Timer(self.flush_frequency, self.flush)
         with self.lock:
             if self.buffer:
                 log.info("flushing: %s" % self.buffer)
@@ -49,7 +67,7 @@ class Channel(object):
     def close(self):
         if self.buffer:
             self.flush()
-        self.flusher.cancel()
+        self.flusher.stop()
 
 
 def run_command(command, websocket):
