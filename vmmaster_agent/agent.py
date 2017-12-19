@@ -1,3 +1,4 @@
+import logging
 from twisted.internet import reactor as twisted_reactor
 from twisted.internet.endpoints import TCP4ServerEndpoint
 
@@ -22,4 +23,5 @@ def main():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()
