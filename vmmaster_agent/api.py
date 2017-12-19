@@ -7,7 +7,7 @@ from twisted.web.server import NOT_DONE_YET
 from autobahn.twisted.websocket import WebSocketServerFactory, WebSocketServerProtocol
 from autobahn.twisted.resource import WebSocketResource
 
-from backend import take_screenshot, run_script
+from backend import take_screenshot, run_script, take_screencast
 
 
 def json_response(data, request):
@@ -68,6 +68,48 @@ class RunScriptWebSocketProtocol(WebSocketServerProtocol):
             self.sendClose(code=3001, reason=unicode(result)[:120])
 
 
+class TakeScreencastProtocol(WebSocketServerProtocol):
+    screencast = None
+
+    def onOpen(self):
+        print 'open'
+        self.screencast = take_screencast.Screencast(self)
+        d = deferToThread(self.screencast.start)
+        d.addBoth(lambda s: None)
+
+    def onMessage(self, payload, isBinary):
+        if 'stop' in payload:
+            self.endConnection()
+
+    def endConnection(self):
+        print 'stopping...'
+        self.screencast.stop()
+
+
+class TakeScreencast(WebSocketResource):
+    isLeaf = True
+
+    def __init__(self):
+        wsfactory = WebSocketServerFactory()
+        wsfactory.protocol = TakeScreencastProtocol
+
+        enableCompression = False
+        if enableCompression:
+            from autobahn.websocket.compress import PerMessageDeflateOffer, \
+                PerMessageDeflateOfferAccept
+            # Function to accept offers from the client ..
+
+            def accept(offers):
+                for offer in offers:
+                    if isinstance(offer, PerMessageDeflateOffer):
+                        return PerMessageDeflateOfferAccept(offer)
+
+            wsfactory.setProtocolOptions(perMessageCompressionAccept=accept)
+
+        wsfactory.setProtocolOptions(echoCloseCodeReason=True)
+        super(TakeScreencast, self).__init__(wsfactory)
+
+
 class RunScriptWebSocket(WebSocketResource):
     isLeaf = True
 
@@ -85,4 +127,5 @@ class ApiServer(Site):
         Site.__init__(self, self.root)
         self.root.server = self
         self.root.putChild('takeScreenshot', TakeScreenshot())
+        self.root.putChild('takeScreencast', TakeScreencast())
         self.root.putChild('runScript', RunScript())

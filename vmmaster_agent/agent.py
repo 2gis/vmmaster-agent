@@ -11,6 +11,7 @@ class VMMasterAgent(object):
         self.endpoint_api.listen(ApiServer())
 
     def run(self):
+        print 'starting...'
         self.reactor.run()
 
     def stop(self):
