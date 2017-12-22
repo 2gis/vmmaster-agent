@@ -74,14 +74,16 @@ def run_command(command, websocket):
     env = os.environ.copy()
     env['PYTHONUNBUFFERED'] = '1'
     log.info("Running command: %s" % str(command))
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+    with tempfile.NamedTemporaryFile(delete=True) as f:
+        with open(f.name, 'rb') as stdout:
+            process = subprocess.Popen(command, stdout=stdout, stderr=stdout, env=env)
 
-    channel = Channel(websocket, autoflush=True)
-    while process.poll() is None:
-        channel.write(process.stdout.read(1).decode(ENCODING))
+            channel = Channel(websocket, autoflush=True)
+            while process.poll() is None:
+                channel.write(process.stdout.read(1).decode(ENCODING))
 
-    channel.write(process.stdout.read().decode(ENCODING))
-    channel.close()
+            channel.write(process.stdout.read().decode(ENCODING))
+            channel.close()
 
     if isinstance(channel.channel, str) or isinstance(channel.channel, unicode):
         output = channel.channel
